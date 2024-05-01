@@ -12,10 +12,18 @@ from config_data.config import Config, load_config
 # Импортируем вспомогательные функции для создания нужных объектов
 # ...
 from keyboards.set_menu import set_main_menu
+from lexicon.lexicon_en import LEXICON_EN
+from lexicon.lexicon_ru import LEXICON_RU
+from middlewares.i18n import TranslatorMiddleware
 
 # Инициализируем логгер
 logger = logging.getLogger(__name__)
 
+translations = {
+    'default': 'ru',
+    'en': LEXICON_EN,
+    'ru': LEXICON_RU,
+}
 
 # Функция конфигурирования и запуска бота
 async def main():
@@ -56,11 +64,12 @@ async def main():
 
     # Регистрируем миддлвари
     logger.info('Подключаем миддлвари')
+    dp.update.middleware(TranslatorMiddleware())
     # ...
 
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, _translations=translations)
 
 
 asyncio.run(main())
